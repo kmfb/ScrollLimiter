@@ -56,28 +56,33 @@ const progressBarManager = {
 const notificationManager = {
   show() {
     this.removeExisting();
-    const notification = document.createElement('div');
+    const notification = document.createElement("div");
     Object.assign(notification.style, {
-      position: 'fixed',
-      bottom: '10px',
-      right: '10px',
+      position: "fixed",
+      bottom: "10px",
+      right: "10px",
       backgroundColor: DEFAULTS.NOTIFICATION_CONFIG.BACKGROUND,
       color: DEFAULTS.NOTIFICATION_CONFIG.TEXT_COLOR,
-      padding: '10px',
-      borderRadius: '5px',
+      padding: "10px",
+      borderRadius: "5px",
+      zIndex: "10000",
     });
-    
-    notification.className = 'scroll-limit-notification';
+
+    notification.className = "scroll-limit-notification";
     notification.textContent = "You've reached your scrolling limit!";
     document.body.appendChild(notification);
 
-    setTimeout(() => notification.remove(), DEFAULTS.NOTIFICATION_CONFIG.DURATION);
+    setTimeout(
+      () => notification.remove(),
+      DEFAULTS.NOTIFICATION_CONFIG.DURATION
+    );
   },
 
   removeExisting() {
-    document.querySelectorAll('.scroll-limit-notification')
-      .forEach(notification => notification.remove());
-  }
+    document
+      .querySelectorAll(".scroll-limit-notification")
+      .forEach((notification) => notification.remove());
+  },
 };
 
 // Scroll handler
@@ -93,21 +98,52 @@ function handleScroll() {
 
   const scrollPercentage = (window.scrollY / state.scrollLimit) * 100;
   progressBarManager.update(scrollPercentage);
-  
+
   if (window.scrollY >= state.scrollLimit) {
     window.scrollTo(0, state.scrollLimit);
-    if (!state.hasReachedLimit) {
-      state.hasReachedLimit = true;
-      notificationManager.show();
-    }
+    notificationManager.show();
+  } else {
+    state.hasReachedLimit = false;
   }
 }
 
-// Initialize
-window.addEventListener('scroll', handleScroll);
+// Add debounce to scroll handler
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
 
-chrome.storage.sync.get(['scrollLimit'], (result) => {
-  if (result.scrollLimit) {
-    state.scrollLimit = result.scrollLimit;
+// Use debounced scroll handler
+const debouncedHandleScroll = debounce(handleScroll, 16); // ~60fps
+window.addEventListener("scroll", debouncedHandleScroll);
+
+// Initialize
+window.addEventListener("scroll", handleScroll);
+
+// Add error handling for storage
+chrome.storage.sync.get(["scrollLimit"], (result) => {
+  try {
+    if (result.scrollLimit && Number.isFinite(result.scrollLimit)) {
+      state.scrollLimit = result.scrollLimit;
+    }
+  } catch (error) {
+    console.error("Error loading scroll limit:", error);
   }
 });
+
+// Add cleanup function for extension unload
+function cleanup() {
+  progressBarManager.remove();
+  notificationManager.removeExisting();
+  window.removeEventListener("scroll", handleScroll);
+}
+
+// Add listener for extension cleanup
+chrome.runtime.onDisconnect.addListener(cleanup);
