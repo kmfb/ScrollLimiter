@@ -19,20 +19,21 @@ const state = {
   hasReachedLimit: false,
   progressBar: null,
   scrollTimeout: null,
+  enabled: true,
 };
 
 // Progress bar management
 const progressBarManager = {
   create() {
-    const bar = document.createElement('div');
+    const bar = document.createElement("div");
     Object.assign(bar.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
+      position: "fixed",
+      top: "0",
+      left: "0",
       height: DEFAULTS.PROGRESS_BAR_CONFIG.HEIGHT,
       backgroundColor: DEFAULTS.PROGRESS_BAR_CONFIG.COLOR,
-      transition: 'width 0.2s',
-      zIndex: '9999',
+      transition: "width 0.2s",
+      zIndex: "9999",
     });
     document.body.appendChild(bar);
     return bar;
@@ -49,7 +50,7 @@ const progressBarManager = {
       state.progressBar.remove();
       state.progressBar = null;
     }
-  }
+  },
 };
 
 // Notification management
@@ -87,6 +88,8 @@ const notificationManager = {
 
 // Scroll handler
 function handleScroll() {
+  if (!state.enabled) return;
+
   if (!state.progressBar) {
     state.progressBar = progressBarManager.create();
   }
@@ -128,13 +131,27 @@ window.addEventListener("scroll", debouncedHandleScroll);
 window.addEventListener("scroll", handleScroll);
 
 // Add error handling for storage
-chrome.storage.sync.get(["scrollLimit"], (result) => {
+chrome.storage.sync.get(["scrollLimit", "enabled"], (result) => {
   try {
     if (result.scrollLimit && Number.isFinite(result.scrollLimit)) {
       state.scrollLimit = result.scrollLimit;
     }
+    state.enabled = result.enabled ?? true;
   } catch (error) {
-    console.error("Error loading scroll limit:", error);
+    console.error("Error loading settings:", error);
+  }
+});
+
+// Add storage change listener
+chrome.storage.onChanged.addListener((changes) => {
+  if (changes.enabled) {
+    state.enabled = changes.enabled.newValue;
+    if (!state.enabled) {
+      cleanup();
+    }
+  }
+  if (changes.scrollLimit) {
+    state.scrollLimit = changes.scrollLimit.newValue;
   }
 });
 
