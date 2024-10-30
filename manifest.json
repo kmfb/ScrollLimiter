@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Scroll Limiter",
+  "version": "1.0",
+  "description": "Limits excessive scrolling on social media.",
+  "permissions": [
+    "storage",
+    "notifications",
+    "alarms"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.facebook.com/*",
+        "*://*.twitter.com/*", 
+        "*://*.x.com/*",
+        "*://*.weibo.com/*"
+      ], 
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  }
+}
