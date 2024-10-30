@@ -1,16 +1,16 @@
 // Constants
 const DEFAULTS = {
-  SCROLL_LIMIT: 2000,
+  SCROLL_LIMIT: 8000,
   PROGRESS_BAR_CONFIG: {
-    HEIGHT: '4px',
-    COLOR: '#4CAF50',
+    HEIGHT: "4px",
+    COLOR: "#4CAF50",
     HIDE_DELAY: 1000, // ms
   },
   NOTIFICATION_CONFIG: {
     DURATION: 3000, // ms
-    BACKGROUND: '#333',
-    TEXT_COLOR: '#fff',
-  }
+    BACKGROUND: "#333",
+    TEXT_COLOR: "#fff",
+  },
 };
 
 // State management

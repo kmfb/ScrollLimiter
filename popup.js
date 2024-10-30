@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   chrome.storage.sync.get(["scrollLimit"], (result) => {
     document.getElementById("scrollLimitInput").value =
-      result.scrollLimit || 2000;
+      result.scrollLimit || 8000;
   });
 });
 
