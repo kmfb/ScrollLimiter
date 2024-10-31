@@ -60,7 +60,7 @@ const notificationManager = {
     const notification = document.createElement("div");
     Object.assign(notification.style, {
       position: "fixed",
-      bottom: "10px",
+      top: "10px",
       right: "10px",
       backgroundColor: DEFAULTS.NOTIFICATION_CONFIG.BACKGROUND,
       color: DEFAULTS.NOTIFICATION_CONFIG.TEXT_COLOR,

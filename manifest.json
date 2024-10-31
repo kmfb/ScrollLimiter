@@ -10,7 +10,12 @@
         "*://*.facebook.com/*",
         "*://*.twitter.com/*",
         "*://*.x.com/*",
-        "*://*.weibo.com/*"
+        "*://*.weibo.com/*",
+        "*://*.zhihu.com/*",
+        "*://*.xiaohongshu.com/*",
+        "*://*.bilibili.com/*",
+        "*://*.reddit.com/*",
+        "*://*.youtube.com/*"
       ],
       "js": ["content.js"]
     }
